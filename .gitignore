@@ -1,0 +1,16 @@
+# Third-party data is fetched by `make data`, never committed: the sources carry
+# different and partly restrictive redistribution terms (see README, "Data").
+data/raw/
+data/processed/
+
+# Scores, checkpoints and logs are reproducible from `make train`; weights are large.
+artifacts/
+*.pt
+*.safetensors
+
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store

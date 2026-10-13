@@ -1,0 +1,33 @@
+[project]
+name = "phishsmall"
+version = "0.1.0"
+description = "Do small neural models beat LightGBM at host-name phishing detection under a leak-free evaluation?"
+requires-python = ">=3.12,<3.13"
+license = "MIT"
+dependencies = [
+    # Pinned to the exact versions phishing-url-detector was run with: the baseline
+    # must reproduce its published numbers to the last digit, or nothing here is valid.
+    "lightgbm==4.7.0",
+    "scikit-learn==1.9.0",
+    "numpy==2.5.2",
+    "pandas==3.0.5",
+    "matplotlib==3.11.1",
+    "torch>=2.8",
+    "transformers>=4.56",
+]
+
+[dependency-groups]
+dev = ["pytest>=9.1"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
+markers = ["slow: reads the real raw datasets or trained artefacts (skipped when absent)"]
