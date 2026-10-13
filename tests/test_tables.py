@@ -83,3 +83,27 @@ def test_the_committed_readme_is_in_sync_with_the_committed_results() -> None:
     assert tables.fill(readme, blocks) == readme
     card = tables.MODEL_CARD.read_text()
     assert tables.fill(card, {name: blocks[name] for name in tables.MODEL_CARD_BLOCKS}) == card
+
+
+def test_dedicated_phishing_domains_are_defanged_and_platforms_are_not(report) -> None:
+    from phishsmall.defang import defang
+
+    assert defang("cannca.shop") == "cannca[.]shop"
+    assert defang("cannca[.]shop") == "cannca[.]shop"
+    assert defang("web.app") == "web.app"
+
+    report["meta"]["sets"]["val"]["phishing_concentration"]["top_domains"] = ["netlify.app", "evil.shop"]
+    table = tables.sets_table(report)
+    assert "`evil[.]shop`" in table
+    assert "`netlify.app`" in table
+    assert "evil.shop" not in table
+
+
+@pytest.mark.skipif(not RESULTS_PATH.exists(), reason="no results.json yet")
+def test_no_dedicated_phishing_domain_is_published_in_clear() -> None:
+    from phishsmall.defang import HOSTING_PLATFORMS
+
+    report = json.loads(RESULTS_PATH.read_text())
+    for entry in report["meta"]["sets"].values():
+        for domain in entry.get("phishing_concentration", {}).get("top_domains", []):
+            assert domain in HOSTING_PLATFORMS or "[.]" in domain, domain

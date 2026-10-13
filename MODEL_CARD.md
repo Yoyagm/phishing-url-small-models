@@ -36,7 +36,9 @@ both test sets. Three seeds per neural model. Exact settings live in `src/phishs
 
 ## Training data
 
-PhiUSIIL Phishing URL Dataset (UCI id 967, CC BY 4.0), reduced to 219,036 unique canonical hosts
+PhiUSIIL Phishing URL Dataset by A. Prasad and S. Chandra
+([UCI id 967](https://archive.ics.uci.edu/dataset/967/phiusiil+phishing+url+dataset),
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), reduced to 219,036 unique canonical hosts
 after dropping 58 hosts carrying both labels. The neural models train on 153,180 hosts; the
 remaining training-portion domains form the validation split. PhiUSIIL's legitimate class is a
 collection artefact at the URL level (every legitimate row is `https://www.<domain>` with no

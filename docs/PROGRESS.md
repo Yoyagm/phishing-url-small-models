@@ -1,12 +1,12 @@
 # Progreso
 
-## Estado actual
+## Current status
 
-Estudio terminado en local: 16 entrenamientos (LightGBM ×7, char-CNN ×3, BiGRU ×3, DistilBERT ×3),
-evaluación con bootstrap por dominio, ablaciones, figuras, README y model card regenerados desde
-`reports/results.json`; tests en verde. Siguiente paso: auditoría de publicación (sanitizer) y
-push a `Yoyagm/phishing-url-small-models`, que hace la integración.
-Bloqueos: ninguno.
+The study is complete: 16 training runs (LightGBM ×7, char-CNN ×3, BiGRU ×3, DistilBERT ×3),
+evaluated with a domain-level bootstrap and two ablations; the README, model card and figures are
+generated from `reports/results.json`, and the test suite passes.
+Next step: none required. A natural follow-up is re-running the OOD evaluation on a newer feed
+capture to measure how fast each model degrades. Blockers: none.
 
 ## Registro
 

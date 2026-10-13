@@ -19,6 +19,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from phishsmall.config import MODEL_LABELS, MODEL_NAMES, RESULTS_PATH, ROOT
+from phishsmall.defang import defang
 
 README = ROOT / "README.md"
 MODEL_CARD = ROOT / "MODEL_CARD.md"
@@ -253,7 +254,7 @@ def sets_table(report: dict) -> str:
         entry = sets[key]
         concentration = entry["phishing_concentration"]
         named = ", ".join(
-            f"`{domain}` {count:,}"
+            f"`{defang(domain)}` {count:,}"
             for domain, count in zip(
                 concentration["top_domains"], concentration["top_domain_hosts"], strict=True
             )

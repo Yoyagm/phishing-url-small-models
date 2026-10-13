@@ -45,6 +45,7 @@ from phishsmall.config import (
     TRAIN_SEEDS,
     TRAINED_ON_VALIDATION,
 )
+from phishsmall.defang import defang
 from phishsmall.metrics import (
     RankedScores,
     cluster_bootstrap_weights,
@@ -103,12 +104,13 @@ def phishing_concentration(frame: pd.DataFrame, top: int = 2) -> dict:
     """How much of a set's phishing sits under its ``top`` largest registrable domains.
 
     A set whose phishing is mostly two hosting platforms measures, in effect, two
-    decisions; this is what makes a domain-level confidence interval wide.
+    decisions; this is what makes a domain-level confidence interval wide. Dedicated
+    phishing domains are defanged before they are written anywhere.
     """
     phishing = frame[frame["y"] == 1]
     sizes = phishing["registrable_domain"].value_counts()
     return {
-        "top_domains": sizes.index[:top].tolist(),
+        "top_domains": [defang(domain) for domain in sizes.index[:top]],
         "top_domain_hosts": [int(size) for size in sizes.iloc[:top]],
         "share_of_phishing": float(sizes.iloc[:top].sum() / max(1, len(phishing))),
     }

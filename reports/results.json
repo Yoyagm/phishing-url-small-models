@@ -70,7 +70,7 @@
         "phishing_concentration": {
           "top_domains": [
             "netlify.app",
-            "cannca.shop"
+            "cannca[.]shop"
           ],
           "top_domain_hosts": [
             241,
