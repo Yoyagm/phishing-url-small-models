@@ -1,0 +1,438 @@
+{
+ "meta": {
+  "sets": {
+   "train": {
+    "n": 8000,
+    "n_phishing": 3000,
+    "registrable_domains": 4000,
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "phishing_concentration": {
+     "top_domains": [
+      "web.app",
+      "repl.co"
+     ],
+     "top_domain_hosts": [
+      50,
+      30
+     ],
+     "share_of_phishing": 0.08
+    }
+   },
+   "val": {
+    "n": 1000,
+    "n_phishing": 300,
+    "registrable_domains": 500,
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "phishing_concentration": {
+     "top_domains": [
+      "web.app",
+      "repl.co"
+     ],
+     "top_domain_hosts": [
+      50,
+      30
+     ],
+     "share_of_phishing": 0.08
+    }
+   },
+   "internal": {
+    "n": 1726,
+    "n_phishing": 1000,
+    "registrable_domains": 863,
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "phishing_concentration": {
+     "top_domains": [
+      "web.app",
+      "repl.co"
+     ],
+     "top_domain_hosts": [
+      50,
+      30
+     ],
+     "share_of_phishing": 0.08
+    }
+   },
+   "ood": {
+    "n": 10000,
+    "n_phishing": 1000,
+    "registrable_domains": 5000,
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "phishing_concentration": {
+     "top_domains": [
+      "web.app",
+      "repl.co"
+     ],
+     "top_domain_hosts": [
+      50,
+      30
+     ],
+     "share_of_phishing": 0.08
+    }
+   },
+   "openphish_hosts": {
+    "n": 260
+   },
+   "openphish_rows": {
+    "n": 299
+   }
+  },
+  "reproduction": {
+   "internal": {
+    "roc_auc": {
+     "published": 0.9186758425833806,
+     "reproduced": 0.9186758425833806,
+     "match": true
+    },
+    "recall_at_fpr_1pct": {
+     "published": 0.725922131147541,
+     "reproduced": 0.725922131147541,
+     "match": true
+    }
+   },
+   "ood": {
+    "roc_auc": {
+     "published": 0.9372024471270224,
+     "reproduced": 0.9372024471270224,
+     "match": true
+    },
+    "recall_at_fpr_1pct": {
+     "published": 0.705472034654096,
+     "reproduced": 0.705472034654096,
+     "match": true
+    }
+   }
+  }
+ },
+ "models": {
+  "lightgbm_published": {
+   "seeds": [
+    42
+   ],
+   "n_parameters": 300,
+   "train_rows": 9000,
+   "device": "cpu",
+   "best_epochs": [
+    null
+   ],
+   "best_val_roc_auc": [
+    null
+   ],
+   "train_minutes_mean": 0.07
+  },
+  "char_cnn": {
+   "seeds": [
+    0,
+    1,
+    2
+   ],
+   "n_parameters": 124961,
+   "train_rows": 8000,
+   "device": "mps",
+   "best_epochs": [
+    16,
+    12,
+    14
+   ],
+   "best_val_roc_auc": [
+    0.8892,
+    0.889,
+    0.8901
+   ],
+   "train_minutes_mean": 2.1
+  }
+ },
+ "results": {
+  "lightgbm_published": {
+   "ood": {
+    "mean": {
+     "roc_auc": 0.9372,
+     "pr_auc": 0.9,
+     "recall_at_fpr_1pct": 0.705,
+     "recall_at_fpr_01pct": 0.5049999999999999,
+     "precision_at_operating_point": 0.95,
+     "tp": 705,
+     "fp": 99,
+     "fn": 295,
+     "tn": 9000
+    },
+    "sd": {
+     "roc_auc": 0.0,
+     "pr_auc": 0.0,
+     "recall_at_fpr_1pct": 0.0,
+     "recall_at_fpr_01pct": 0.0,
+     "precision_at_operating_point": 0.0
+    },
+    "ci95": {
+     "roc_auc": [
+      0.9272,
+      0.9472
+     ],
+     "recall_at_fpr_1pct": [
+      0.6549999999999999,
+      0.745
+     ]
+    },
+    "delta_vs": {},
+    "per_seed": [
+     {
+      "seed": 42,
+      "recall_at_fpr_1pct": 0.705
+     }
+    ]
+   },
+   "internal": {
+    "mean": {
+     "roc_auc": 0.9187,
+     "pr_auc": 0.9,
+     "recall_at_fpr_1pct": 0.726,
+     "recall_at_fpr_01pct": 0.526,
+     "precision_at_operating_point": 0.95,
+     "tp": 726,
+     "fp": 89,
+     "fn": 274,
+     "tn": 9000
+    },
+    "sd": {
+     "roc_auc": 0.0,
+     "pr_auc": 0.0,
+     "recall_at_fpr_1pct": 0.0,
+     "recall_at_fpr_01pct": 0.0,
+     "precision_at_operating_point": 0.0
+    },
+    "ci95": {
+     "roc_auc": [
+      0.9087,
+      0.9287
+     ],
+     "recall_at_fpr_1pct": [
+      0.6759999999999999,
+      0.766
+     ]
+    },
+    "delta_vs": {},
+    "per_seed": [
+     {
+      "seed": 42,
+      "recall_at_fpr_1pct": 0.726
+     }
+    ]
+   }
+  },
+  "char_cnn": {
+   "ood": {
+    "mean": {
+     "roc_auc": 0.92,
+     "pr_auc": 0.9,
+     "recall_at_fpr_1pct": 0.65,
+     "recall_at_fpr_01pct": 0.45,
+     "precision_at_operating_point": 0.95,
+     "tp": 650,
+     "fp": 98,
+     "fn": 350,
+     "tn": 9000
+    },
+    "sd": {
+     "roc_auc": 0.0,
+     "pr_auc": 0.0,
+     "recall_at_fpr_1pct": 0.012,
+     "recall_at_fpr_01pct": 0.0,
+     "precision_at_operating_point": 0.0
+    },
+    "ci95": {
+     "roc_auc": [
+      0.91,
+      0.93
+     ],
+     "recall_at_fpr_1pct": [
+      0.6,
+      0.6900000000000001
+     ]
+    },
+    "delta_vs": {
+     "lightgbm_published": {
+      "recall_at_fpr_1pct": {
+       "point": -0.055,
+       "ci95": [
+        -0.08,
+        -0.03
+       ],
+       "share_of_resamples_above_zero": 0.0
+      },
+      "roc_auc": {
+       "point": -0.0172,
+       "ci95": [
+        -0.02,
+        -0.014
+       ],
+       "share_of_resamples_above_zero": 0.0
+      }
+     }
+    },
+    "per_seed": [
+     {
+      "seed": 0,
+      "recall_at_fpr_1pct": 0.66
+     },
+     {
+      "seed": 1,
+      "recall_at_fpr_1pct": 0.63
+     },
+     {
+      "seed": 2,
+      "recall_at_fpr_1pct": 0.66
+     }
+    ]
+   },
+   "internal": {
+    "mean": {
+     "roc_auc": 0.91,
+     "pr_auc": 0.9,
+     "recall_at_fpr_1pct": 0.7,
+     "recall_at_fpr_01pct": 0.49999999999999994,
+     "precision_at_operating_point": 0.95,
+     "tp": 700,
+     "fp": 90,
+     "fn": 300,
+     "tn": 9000
+    },
+    "sd": {
+     "roc_auc": 0.0,
+     "pr_auc": 0.0,
+     "recall_at_fpr_1pct": 0.012,
+     "recall_at_fpr_01pct": 0.0,
+     "precision_at_operating_point": 0.0
+    },
+    "ci95": {
+     "roc_auc": [
+      0.9,
+      0.92
+     ],
+     "recall_at_fpr_1pct": [
+      0.6499999999999999,
+      0.74
+     ]
+    },
+    "delta_vs": {
+     "lightgbm_published": {
+      "recall_at_fpr_1pct": {
+       "point": -0.026,
+       "ci95": [
+        -0.1,
+        0.05
+       ],
+       "share_of_resamples_above_zero": 0.31
+      },
+      "roc_auc": {
+       "point": -0.0087,
+       "ci95": [
+        -0.03,
+        0.01
+       ],
+       "share_of_resamples_above_zero": 0.2
+      }
+     }
+    },
+    "per_seed": [
+     {
+      "seed": 0,
+      "recall_at_fpr_1pct": 0.7
+     },
+     {
+      "seed": 1,
+      "recall_at_fpr_1pct": 0.69
+     },
+     {
+      "seed": 2,
+      "recall_at_fpr_1pct": 0.71
+     }
+    ]
+   },
+   "validation": {
+    "roc_auc_per_seed": [
+     0.8892,
+     0.889,
+     0.8901
+    ]
+   }
+  }
+ },
+ "openphish": {
+  "lightgbm_published": {
+   "mean_rate_hosts": 0.6192,
+   "mean_rate_rows": 0.5853
+  },
+  "char_cnn": {
+   "mean_rate_hosts": 0.5,
+   "mean_rate_rows": 0.48
+  }
+ },
+ "ablations": {
+  "threshold_transfer": {
+   "char_cnn": {
+    "mean": {
+     "ood_recall": 0.86,
+     "ood_fpr": 0.0656,
+     "ood_fp": 590.4,
+     "ood_tp": 860
+    }
+   }
+  },
+  "unfiltered_ood": {
+   "lightgbm_published": {
+    "per_seed": [
+     {
+      "filtered": {
+       "recall_at_fpr_1pct": 0.705
+      },
+      "unfiltered": {
+       "recall_at_fpr_1pct": 0.729
+      }
+     }
+    ],
+    "mean_inflation": {
+     "recall_at_fpr_1pct": 0.024,
+     "roc_auc": 0.0024000000000000002
+    }
+   },
+   "char_cnn": {
+    "per_seed": [
+     {
+      "filtered": {
+       "recall_at_fpr_1pct": 0.65
+      },
+      "unfiltered": {
+       "recall_at_fpr_1pct": 0.73
+      }
+     }
+    ],
+    "mean_inflation": {
+     "recall_at_fpr_1pct": 0.08,
+     "roc_auc": 0.008
+    }
+   }
+  }
+ },
+ "false_positive_profile": {
+  "all_benign": {
+   "n": 9000,
+   "share_with_digit": 0.1,
+   "share_punycode": 0.05,
+   "share_with_hyphen": 0.1,
+   "mean_length": 14.0
+  },
+  "lightgbm_published": {
+   "n": 99,
+   "share_with_digit": 0.6,
+   "share_punycode": 0.05,
+   "share_with_hyphen": 0.1,
+   "mean_length": 14.0
+  },
+  "char_cnn": {
+   "n": 98,
+   "share_with_digit": 0.9,
+   "share_punycode": 0.05,
+   "share_with_hyphen": 0.1,
+   "mean_length": 14.0
+  }
+ }
+}
