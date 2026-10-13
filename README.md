@@ -7,7 +7,7 @@ scratch, fine-tunes DistilBERT, and compares all three against the LightGBM mode
 leak-free evaluation*, reproduced to the last digit. The result is reported as it came out.
 
 <!-- BEGIN:headline -->
-
+On the out-of-distribution + temporal test (131,396 hosts), the best small neural model, **DistilBERT (fine-tuned)**, reaches **71.1 % recall at a 1 % false-positive rate** (95 % CI [62.2, 78.7], mean of 3 seeds), against **70.5 %** for the published LightGBM: a paired difference of +0.6 points [-6.7, +6.1]. Against LightGBM trained on the same rows and averaged over the same seeds, the difference is -2.1 points [-8.3, +2.7].
 <!-- END:headline -->
 
 **Short answer: no.** Fine-tuned DistilBERT ties LightGBM out of distribution, the two models
@@ -56,7 +56,12 @@ byte-for-byte** from phishing-url-detector (`src/phishurl/`, pinned by SHA-256 i
   during training.
 
 <!-- BEGIN:sets -->
-
+| Set | Hosts | Phishing | Registrable domains | Phishing in its 2 largest domains |
+|---|---:|---:|---:|---|
+| Training (neural models, LightGBM control) | 153,180 | 56,091 | 126,324 | 14.8 % (`firebaseapp.com` 5,418, `weeblysite.com` 2,889) |
+| Validation (early stopping, threshold ablation) | 15,524 | 4,729 | 14,036 | 8.7 % (`netlify.app` 241, `cannca.shop` 172) |
+| Internal hold-out (test) | 50,332 | 23,424 | 35,091 | 38.5 % (`web.app` 5,527, `repl.co` 3,498) |
+| OOD + temporal (test) | 131,396 | 31,396 | 111,119 | 20.8 % (`weebly.com` 4,295, `wixstudio.com` 2,243) |
 <!-- END:sets -->
 
 The last column explains a feature of every result below: the internal hold-out's phishing is
@@ -81,7 +86,14 @@ on an Apple M4; in practice every seed peaked after its first epoch and stopped 
 LoRA was not needed: full fine-tuning of 67 M parameters fits comfortably in 16 GB.
 
 <!-- BEGIN:cost -->
-
+| Model | Trainable parameters | Training rows | Device | Best epoch per seed | Validation ROC-AUC per seed | Training time per seed |
+|---|---:|---:|---|---|---|---:|
+| LightGBM, published (reproduced) | 300 trees × 31 leaves | 168,704 | cpu | — | in training data | 4 s |
+| LightGBM, published rows, seeds 0-2 | 300 trees × 31 leaves | 168,704 | cpu | — | in training data | 11 s |
+| LightGBM, neural models' rows | 300 trees × 31 leaves | 153,180 | cpu | — | 0.8399, 0.8396, 0.8397 | 4 s |
+| char-CNN (from scratch) | 124,961 | 153,180 | mps | 16, 19, 12 | 0.8892, 0.8904, 0.8879 | 99 s |
+| BiGRU (from scratch) | 55,457 | 153,180 | mps | 20, 16, 18 | 0.8850, 0.8852, 0.8842 | 2.7 min |
+| DistilBERT (fine-tuned) | 66,954,241 | 153,180 | mps | 1, 1, 1 | 0.9027, 0.9036, 0.9037 | 19.2 min |
 <!-- END:cost -->
 
 ### Metrics and uncertainty
@@ -97,13 +109,31 @@ LoRA was not needed: full fine-tuning of 67 M parameters fits comfortably in 16 
   published ROC-AUC and recall on both test sets to 1e-9:
 
 <!-- BEGIN:reproduction -->
-
+| Test set | Metric | Published (phishing-url-detector) | Reproduced here | Identical |
+|---|---|---:|---:|:---:|
+| Internal hold-out | ROC-AUC | 0.9186758425833806 | 0.9186758425833806 | yes |
+| Internal hold-out | Recall @ FPR 1 % | 0.725922131147541 | 0.725922131147541 | yes |
+| OOD + temporal | ROC-AUC | 0.9372024471270224 | 0.9372024471270224 | yes |
+| OOD + temporal | Recall @ FPR 1 % | 0.705472034654096 | 0.705472034654096 | yes |
 <!-- END:reproduction -->
 
 ## Results
 
 <!-- BEGIN:results -->
-
+| Model | Seeds | Test set | ROC-AUC [95 % CI] | Recall @ FPR 1 % [95 % CI] | Recall per seed | TP | FP | Recall @ FPR 0.1 % |
+|---|---|---|---:|---:|---:|---:|---:|---:|
+| LightGBM, published (reproduced) | 1 (42) | OOD + temporal | 0.9372 [0.912, 0.954] | **70.5 %** [61.2, 76.6] | — | 22,149 | 999 | 50.8 % |
+| LightGBM, published rows, seeds 0-2 | 3 (0, 1, 2) | OOD + temporal | 0.9374 [0.912, 0.954] | **72.0 %** [62.1, 78.4] | 72.8 / 70.7 / 72.5 | 22,610 | 1,000 | 51.4 % |
+| LightGBM, neural models' rows | 3 (0, 1, 2) | OOD + temporal | 0.9378 [0.912, 0.954] | **73.2 %** [62.9, 79.9] | 72.5 / 73.2 / 73.9 | 22,982 | 988 | 51.8 % |
+| char-CNN (from scratch) | 3 (0, 1, 2) | OOD + temporal | 0.9360 [0.912, 0.952] | **59.9 %** [49.3, 69.1] | 57.2 / 60.7 / 61.8 | 18,800 | 1,000 | 22.4 % |
+| BiGRU (from scratch) | 3 (0, 1, 2) | OOD + temporal | 0.9400 [0.917, 0.955] | **68.3 %** [58.9, 75.9] | 70.0 / 66.7 / 68.2 | 21,451 | 1,000 | 24.0 % |
+| DistilBERT (fine-tuned) | 3 (0, 1, 2) | OOD + temporal | 0.9488 [0.929, 0.962] | **71.1 %** [62.2, 78.7] | 68.5 / 70.1 / 74.7 | 22,324 | 1,000 | 44.5 % |
+| LightGBM, published (reproduced) | 1 (42) | Internal hold-out | 0.9187 [0.856, 0.949] | **72.6 %** [51.2, 83.0] | — | 17,004 | 269 | 63.5 % |
+| LightGBM, published rows, seeds 0-2 | 3 (0, 1, 2) | Internal hold-out | 0.9186 [0.856, 0.949] | **72.6 %** [51.1, 83.0] | 72.5 / 72.6 / 72.6 | 17,001 | 269 | 62.9 % |
+| LightGBM, neural models' rows | 3 (0, 1, 2) | Internal hold-out | 0.9185 [0.856, 0.949] | **72.5 %** [51.0, 82.9] | 72.4 / 72.5 / 72.6 | 16,985 | 268 | 63.2 % |
+| char-CNN (from scratch) | 3 (0, 1, 2) | Internal hold-out | 0.9420 [0.897, 0.964] | **77.3 %** [59.7, 85.7] | 77.3 / 77.2 / 77.3 | 18,100 | 268 | 69.2 % |
+| BiGRU (from scratch) | 3 (0, 1, 2) | Internal hold-out | 0.9391 [0.892, 0.962] | **77.0 %** [59.1, 85.6] | 76.9 / 77.1 / 76.9 | 18,027 | 269 | 68.8 % |
+| DistilBERT (fine-tuned) | 3 (0, 1, 2) | Internal hold-out | 0.9501 [0.912, 0.969] | **78.5 %** [61.8, 86.7] | 78.8 / 78.4 / 78.4 | 18,395 | 269 | 72.3 % |
 <!-- END:results -->
 
 TP and FP are counts at the operating point, averaged over seeds. FP sits near 1 % of the benign
@@ -115,7 +145,22 @@ are what decide.
 ### Paired differences against LightGBM
 
 <!-- BEGIN:deltas -->
-
+| Model | Test set | Compared with | Δ recall @ FPR 1 % (pts) [95 % CI] | Δ ROC-AUC [95 % CI] | Resamples where the model is ahead |
+|---|---|---|---:|---:|---:|
+| char-CNN (from scratch) | OOD + temporal | vs published LightGBM | -10.7 [-19.8, -3.3] | -0.0012 [-0.0049, +0.0022] | 0 % |
+| char-CNN (from scratch) | OOD + temporal | vs LightGBM control | -13.3 [-21.5, -7.0] | -0.0018 [-0.0053, +0.0015] | 0 % |
+| BiGRU (from scratch) | OOD + temporal | vs published LightGBM | -2.2 [-9.3, +3.0] | +0.0028 [+0.0000, +0.0056] | 30 % |
+| BiGRU (from scratch) | OOD + temporal | vs LightGBM control | -4.9 [-11.1, -0.6] | +0.0022 [-0.0004, +0.0050] | 0 % |
+| DistilBERT (fine-tuned) | OOD + temporal | vs published LightGBM | +0.6 [-6.7, +6.1] | +0.0116 [+0.0075, +0.0169] | 60 % |
+| DistilBERT (fine-tuned) | OOD + temporal | vs LightGBM control | -2.1 [-8.3, +2.7] | +0.0110 [+0.0070, +0.0164] | 30 % |
+| char-CNN (from scratch) | Internal hold-out | vs published LightGBM | +4.7 [+2.7, +8.6] | +0.0233 [+0.0143, +0.0414] | 100 % |
+| char-CNN (from scratch) | Internal hold-out | vs LightGBM control | +4.8 [+2.9, +8.8] | +0.0235 [+0.0144, +0.0418] | 100 % |
+| BiGRU (from scratch) | Internal hold-out | vs published LightGBM | +4.4 [+2.6, +8.0] | +0.0204 [+0.0124, +0.0363] | 100 % |
+| BiGRU (from scratch) | Internal hold-out | vs LightGBM control | +4.4 [+2.7, +8.1] | +0.0206 [+0.0125, +0.0368] | 100 % |
+| DistilBERT (fine-tuned) | Internal hold-out | vs published LightGBM | +5.9 [+3.6, +10.7] | +0.0314 [+0.0194, +0.0556] | 100 % |
+| DistilBERT (fine-tuned) | Internal hold-out | vs LightGBM control | +6.0 [+3.8, +10.8] | +0.0316 [+0.0195, +0.0563] | 100 % |
+| *LightGBM, published rows, seeds 0-2* | OOD + temporal | vs published LightGBM | +1.5 [+0.4, +2.8] | +0.0002 [+0.0000, +0.0004] | 100 % |
+| *LightGBM, neural models' rows* | OOD + temporal | vs published LightGBM | +2.7 [+0.8, +4.8] | +0.0006 [+0.0003, +0.0009] | 100 % |
 <!-- END:deltas -->
 
 ![Paired differences in recall at FPR 1 %](figures/paired_delta_recall.png)
@@ -130,7 +175,14 @@ Phishing-only, so only the detection rate at each model's OOD operating point is
 original reported 58.5 % over URL rows; several rows share a host, so the per-host rate is also given.
 
 <!-- BEGIN:openphish -->
-
+| Model | Detected, per host (n = 260) | Detected, per URL row (n = 299) |
+|---|---:|---:|
+| LightGBM, published (reproduced) | 61.9 % | 58.5 % |
+| LightGBM, published rows, seeds 0-2 | 64.0 % | 60.4 % |
+| LightGBM, neural models' rows | 69.1 % | 65.1 % |
+| char-CNN (from scratch) | 52.4 % | 49.3 % |
+| BiGRU (from scratch) | 63.5 % | 59.9 % |
+| DistilBERT (fine-tuned) | 72.9 % | 67.0 % |
 <!-- END:openphish -->
 
 ## Ablations
@@ -143,7 +195,12 @@ fixed on the grouped validation split at 1 % FPR and carried unchanged to the OO
 runs trained on the validation domains are left out, since for them it is not held out:
 
 <!-- BEGIN:threshold -->
-
+| Model | OOD recall, threshold read off the OOD curve | OOD recall, threshold fixed on validation | OOD FPR actually incurred | False positives per 100,000 benign |
+|---|---:|---:|---:|---:|
+| LightGBM, neural models' rows | 73.2 % | 85.7 % | **6.56 %** | 6,560 |
+| char-CNN (from scratch) | 59.9 % | 87.7 % | **11.96 %** | 11,964 |
+| BiGRU (from scratch) | 68.3 % | 87.5 % | **10.12 %** | 10,122 |
+| DistilBERT (fine-tuned) | 71.1 % | 89.6 % | **12.43 %** | 12,426 |
 <!-- END:threshold -->
 
 ### Skipping the "already seen" filter
@@ -153,7 +210,14 @@ phishing-url-detector removed from the OOD set every Tranco host that also appea
 model, and not equally:
 
 <!-- BEGIN:unfiltered -->
-
+| Model | Recall @ FPR 1 %, seen hosts removed | Recall @ FPR 1 %, seen hosts kept | Inflation (pts) | ROC-AUC inflation |
+|---|---:|---:|---:|---:|
+| LightGBM, published (reproduced) | 70.5 % | 73.0 % | +2.4 | +0.0039 |
+| LightGBM, published rows, seeds 0-2 | 72.0 % | 74.4 % | +2.4 | +0.0039 |
+| LightGBM, neural models' rows | 73.2 % | 74.5 % | +1.3 | +0.0038 |
+| char-CNN (from scratch) | 59.9 % | 64.4 % | +4.5 | +0.0056 |
+| BiGRU (from scratch) | 68.3 % | 72.0 % | +3.7 | +0.0049 |
+| DistilBERT (fine-tuned) | 71.1 % | 73.8 % | +2.7 | +0.0048 |
 <!-- END:unfiltered -->
 
 ### What the false positives look like
@@ -162,7 +226,15 @@ The benign OOD hosts each model flags at its 1 %-FPR operating point, against th
 whole:
 
 <!-- BEGIN:false_positives -->
-
+| Benign hosts | Count | Contain a digit | Punycode (`xn--`) | Contain a hyphen | Mean length |
+|---|---:|---:|---:|---:|---:|
+| All benign OOD hosts | 100,000 | 9.6 % | 0.1 % | 8.4 % | 12.7 |
+| Flagged by LightGBM, published (reproduced) | 999 | 64.5 % | 10.7 % | 25.3 % | 15.5 |
+| Flagged by LightGBM, published rows, seeds 0-2 | 1,000 | 58.8 % | 11.3 % | 20.5 % | 15.4 |
+| Flagged by LightGBM, neural models' rows | 988 | 61.0 % | 10.3 % | 20.1 % | 15.3 |
+| Flagged by char-CNN (from scratch) | 1,000 | 85.2 % | 10.7 % | 31.7 % | 15.7 |
+| Flagged by BiGRU (from scratch) | 1,000 | 82.1 % | 10.4 % | 32.0 % | 16.2 |
+| Flagged by DistilBERT (fine-tuned) | 1,000 | 71.9 % | 12.1 % | 29.2 % | 16.1 |
 <!-- END:false_positives -->
 
 ## What won, and why we think so
